@@ -1,0 +1,33 @@
+# Dependency directories
+node_modules/
+
+# Environment variables
+.env
+.env.local
+
+# Build outputs
+dist/
+build/
+out/
+
+# TypeScript-specific files
+*.tsbuildinfo
+
+# JavaScript output
+*.js
+*.js.map
+
+# Logs and runtime data
+*.log
+*.pid
+*.seed
+*.db
+
+# User-specific files
+.vscode/
+.idea/
+.DS_Store
+
+# Dependency lock files
+package-lock.json
+yarn.lock
