@@ -1,3 +1,4 @@
+import { authResolver } from './resolvers/auth.resolver';
 import { usersResolver } from './resolvers/user.resolver';
 import { readFileSync } from 'fs';
 import path from 'path';
@@ -10,15 +11,23 @@ const userTypes = readFileSync(
 	}
 );
 
+const authTypes = readFileSync(
+	path.join(__dirname, './typeDefs/auth.graphql'),
+	{
+		encoding: 'utf-8',
+	}
+);
+
 export const typeDefs = `
     ${userTypes}
+	${authTypes}
 `;
 
 export const resolvers = {
 	Query: {
 		...usersResolver.Query,
 	},
-	Mutation: { ...usersResolver.Mutation },
+	Mutation: { ...usersResolver.Mutation, ...authResolver.Mutation },
 };
 
 export const schema = createSchema({

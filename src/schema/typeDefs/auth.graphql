@@ -1,0 +1,26 @@
+type Query {
+	auth_logout: Message
+	auth_getMe: User
+}
+type Mutation {
+	auth_login(email: String!, password: String!): AuthPayload!
+	auth_register(
+		username: String!
+		email: String!
+		password: String!
+		role: Int
+	): User
+	auth_verify(email: String!): Message
+	auth_forgot_password(email: String!): Message
+	auth_verify_token(token: String!): Message
+	auth_reset_password(
+		password: String!
+		confirmPassword: String!
+		token: String!
+	): Message
+}
+
+type AuthPayload {
+	token: String!
+	user: User!
+}

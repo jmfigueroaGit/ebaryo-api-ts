@@ -1,9 +1,24 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import validator from 'validator';
 import crypto from 'crypto';
 
-const userSchema = new mongoose.Schema(
+export interface UserDocument extends Document {
+	username: string;
+	email: string;
+	password: string;
+	verified: boolean;
+	isCompleted: boolean;
+	role: number;
+	notification: boolean;
+	resetPasswordToken: string;
+	resetPasswordExpire: Date;
+
+	comparePassword(enteredPassword: string): Promise<boolean>;
+	getResetPasswordToken(): string;
+}
+
+const userSchema = new mongoose.Schema<UserDocument>(
 	{
 		username: {
 			type: String,
@@ -13,7 +28,10 @@ const userSchema = new mongoose.Schema(
 		email: {
 			type: String,
 			required: [true, 'Email field is required'],
-			validator: [validator.isEmail, 'Please enter valid email address'],
+			validate: {
+				validator: (value: string) => validator.isEmail(value),
+				message: 'Please enter a valid email address',
+			},
 			unique: true,
 		},
 		password: {
@@ -42,14 +60,18 @@ const userSchema = new mongoose.Schema(
 	},
 	{
 		timestamps: true,
+		toJSON: { virtuals: true },
+		toObject: { virtuals: true },
 	}
 );
 
-userSchema.methods.comparePassword = async function (enteredPassword: string) {
+userSchema.methods.comparePassword = async function (
+	enteredPassword: string
+): Promise<boolean> {
 	return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.pre('save', async function (next) {
+userSchema.pre<UserDocument>('save', async function (next) {
 	if (!this.isModified('password')) {
 		next();
 	}
@@ -58,39 +80,21 @@ userSchema.pre('save', async function (next) {
 	this.password = await bcrypt.hashSync(this.password, salt);
 });
 
-// Generate password reset token
-userSchema.methods.getResetPasswordToken = function () {
-	// Generate token
+userSchema.methods.getResetPasswordToken = function (): string {
 	const resetToken = crypto.randomBytes(20).toString('hex');
 
-	// Hash and set resetPasswordToken field
 	this.resetPasswordToken = crypto
 		.createHash('sha256')
 		.update(resetToken)
 		.digest('hex');
 
-	// Calculate the current time in milliseconds
 	const currentTime = Date.now();
-
-	// Calculate the time for 2 days (48 hours) in milliseconds
 	const twoDaysInMilliseconds = 2 * 24 * 60 * 60 * 1000;
 
-	// Add 2 days to the current time to get the expiration time
-	this.resetPasswordExpire = currentTime + twoDaysInMilliseconds;
+	this.resetPasswordExpire = new Date(currentTime + twoDaysInMilliseconds);
 	return resetToken;
 };
 
-// userSchema.virtual('resident', {
-// 	ref: 'Resident',
-// 	localField: '_id',
-// 	foreignField: 'user',
-// 	justOne: true,
-// });
-
-// Make sure to set the `toObject` and `toJSON` schema options to `true`.
-userSchema.set('toObject', { virtuals: true });
-userSchema.set('toJSON', { virtuals: true });
-
-const User = mongoose.model('User', userSchema);
+const User: Model<UserDocument> = mongoose.model('User', userSchema);
 
 export default User;
