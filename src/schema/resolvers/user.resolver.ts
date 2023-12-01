@@ -1,4 +1,8 @@
 import {
+	isAuthenticated,
+	requiresRole,
+} from '../../middlewares/auth_middleware';
+import {
 	createUser,
 	deleteUser,
 	getAllUsers,
@@ -8,9 +12,11 @@ import {
 
 export const usersResolver = {
 	Query: {
-		users: (_: any, _args: any, context: any) => {
-			return getAllUsers();
-		},
+		users: requiresRole([1])(
+			isAuthenticated((_: any, _args: any, context: any) => {
+				return getAllUsers();
+			})
+		),
 		user: (_: any, _args: any, context: any) => {
 			return getSingleUser(_args);
 		},

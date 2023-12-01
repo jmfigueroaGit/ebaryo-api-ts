@@ -4,7 +4,6 @@ import express from 'express';
 import { createYoga, maskError } from 'graphql-yoga';
 import { useCSRFPrevention } from '@graphql-yoga/plugin-csrf-prevention';
 import { useCookies } from '@whatwg-node/server-plugin-cookies';
-import { schema } from './schema';
 import connectDB from './config/db';
 import {
 	ValidationError,
@@ -13,6 +12,7 @@ import {
 	ForbiddenError,
 	InputError,
 } from './utils/error_handler';
+import { schemaWithMiddleware } from './schema';
 
 // Create an Express app
 const app = express();
@@ -25,7 +25,7 @@ const yoga = createYoga({
 		origin: ['http://localhost:4000'],
 		credentials: true, // Allow sending cookies
 	},
-	schema,
+	schema: schemaWithMiddleware,
 	maskedErrors: {
 		maskError(error, message, isDev): any {
 			if ((error as any)?.extensions?.code instanceof ValidationError) {

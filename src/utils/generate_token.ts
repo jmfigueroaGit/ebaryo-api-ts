@@ -11,14 +11,16 @@ const generateToken = (id: string): string => {
 	return token;
 };
 
-const decoded = async (token: string): Promise<UserDocument | null> => {
+const decoded = async (tokenObj: {
+	value: string;
+}): Promise<UserDocument | null> => {
 	try {
 		const decodedToken = jwt.verify(
-			token,
+			tokenObj.value,
 			process.env.JWT_SECRET as string
 		) as { userId: string };
 
-		const user = await User.findById(decodedToken.userId).populate('resident');
+		const user = await User.findById(decodedToken.userId);
 
 		return user;
 	} catch (error) {

@@ -1,0 +1,135 @@
+type Location {
+	houseNumber: String!
+	street: String!
+	barangay: String!
+	province: String!
+	city: String!
+	zipcode: String!
+}
+
+type Contact {
+	hotline: String!
+	email: String!
+}
+
+type Demographic {
+	residents: Int!
+	families: Int!
+	households: Int!
+	landAreas: Int!
+	streets: Int!
+	healthCenters: Int!
+	schools: Int!
+	seniorCitizen: Int!
+	pwd: Int!
+	singleParent: Int!
+}
+
+type Official {
+	name: String
+	position: String
+	image: String
+}
+
+type BarangayInfo {
+	location: Location!
+	contact: Contact!
+	demographic: Demographic!
+}
+
+type BarangayOfficials {
+	barangayOfficials: [Official]!
+	skOfficials: [Official]!
+}
+
+type Image {
+	public_id: String
+	url: String
+}
+
+type Barangay {
+	_id: ID!
+	name: String!
+	barangayInfo: BarangayInfo!
+	barangayOfficials: BarangayOfficials!
+	images: [Image]!
+	barangayMap: Image!
+	createdAt: String!
+	updatedAt: String!
+}
+
+type Query {
+	barangay(barangayId: ID!): Barangay
+	barangays: [Barangay]!
+}
+
+type Mutation {
+	barangay_create(input: BarangayInput!): Barangay!
+	barangay_officials_update(
+		barangayId: ID!
+		input: BarangayOfficialsInput!
+	): Message
+	barangay_images_update(barangayId: ID!, images: [ImageInput]!): Message
+	barangay_delete(barangayId: ID!): Message!
+}
+
+# Barangay Info Setup
+
+input LocationInput {
+	houseNumber: String!
+	street: String!
+	barangay: String!
+	province: String!
+	city: String!
+	zipcode: String!
+}
+
+input ContactInput {
+	hotline: String!
+	email: String!
+}
+
+input DemographicInput {
+	residents: Int
+	families: Int
+	households: Int
+	landAreas: Int
+	streets: Int
+	healthCenters: Int
+	schools: Int
+	seniorCitizen: Int
+	pwd: Int
+	singleParent: Int
+}
+
+input BarangayInfoInput {
+	location: LocationInput!
+	contact: ContactInput!
+	demographic: DemographicInput
+}
+
+# Barangay Official Setup
+
+input OfficialInput {
+	name: String
+	position: String
+	image: String
+}
+
+input BarangayOfficialsInput {
+	barangayOfficials: [OfficialInput]!
+	skOfficials: [OfficialInput]!
+}
+
+input ImageInput {
+	public_id: String
+	url: String
+}
+
+input BarangayInput {
+	name: String!
+	barangayInfo: BarangayInfoInput!
+	barangayOfficials: BarangayOfficialsInput
+	images: [ImageInput]
+	barangayMap: ImageInput
+}
