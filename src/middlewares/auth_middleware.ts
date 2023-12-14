@@ -3,8 +3,10 @@ import jwt from 'jsonwebtoken';
 import {
 	AuthenticationError,
 	ForbiddenError,
+	InputError,
 	NotFoundError,
 } from '../utils/error_handler';
+import Barangay from '../models/Barangay';
 
 interface ResolverFunction {
 	(parent: any, args: any, context: any, info: any): any;
@@ -33,35 +35,33 @@ const requiresRole = (allowedRoles: number[]) => {
 	};
 };
 
-// Function to check if a barangay exists
-// const isBarangayExists = async (barangayId: string) => {
-//   const barangay = await Barangay.findById(barangayId);
+// Check user is included to barangay admins
+export const isUserIncluded = (resolver: ResolverFunction) => {
+	return async (parent: any, args: any, context: any, info: any) => {
+		const { user } = context;
+		const { barangayId } = args;
 
-//   if (!barangay) {
-//     throw new NotFoundError('Barangay does not exist');
-//   }
+		if (!barangayId || !user) {
+			throw new InputError('Barangay ID or User ID is missing in the request!');
+		}
 
-//   return barangay;
-// };
+		try {
+			const barangay = await Barangay.findById(barangayId);
 
-// Authorization for barangay security
-// const isAdminInclude = async (user: any, barangayId: string) => {
-//   const barangay = await Barangay.findById(barangayId);
+			if (!barangay) {
+				throw new NotFoundError('Barangay not found!');
+			}
 
-//   if (!barangay) {
-//     throw new NotFoundError('Barangay not found with this id');
-//   }
+			// Check if userId exists in adminIds array of Barangay
+			if (!barangay.adminIds.includes(user._id)) {
+				throw new ForbiddenError('User does not have access to this Barangay!');
+			}
 
-//   if (user.role !== 1 && !barangay.adminIds.includes(user._id)) {
-//     throw new ForbiddenError('You do not have the required permissions!');
-//   }
-
-//   return barangay;
-// };
-
-export {
-	isAuthenticated,
-	requiresRole,
-	//   isBarangayExists,
-	//   isAdminInclude,
+			return resolver(parent, args, context, info);
+		} catch (error) {
+			throw new ForbiddenError('Access denied!'); // You can customize the error message here
+		}
+	};
 };
+
+export { isAuthenticated, requiresRole };

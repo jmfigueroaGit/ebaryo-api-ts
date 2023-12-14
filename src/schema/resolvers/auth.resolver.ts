@@ -1,3 +1,4 @@
+import { isAuthenticated } from '../../middlewares/auth_middleware';
 import {
 	forgotPassword,
 	getMe,
@@ -9,9 +10,9 @@ import {
 
 export const authResolver = {
 	Query: {
-		auth_getMe: (_: any, _args: any, context: any) => {
+		auth_getMe: isAuthenticated((_: any, _args: any, context: any) => {
 			return getMe(_args, context);
-		},
+		}),
 	},
 	Mutation: {
 		auth_login: (_: any, _args: any, context: any) => {

@@ -1,0 +1,120 @@
+# Type
+
+type Resident {
+	_id: ID!
+	name: Name!
+	sex: String!
+	birthday: String!
+	civilStatus: String!
+	nationality: String!
+	contactNumber: String!
+	email: String!
+	contactPerson: ContactPerson!
+	slug: String!
+	address: Address!
+	background: Background
+	image_url: String
+	barangay: Barangay
+}
+
+type Name {
+	first: String!
+	middle: String
+	last: String!
+	extension: String
+}
+
+type ContactPerson {
+	name: String!
+	contactNumber: String
+	relationship: String!
+	address: String
+}
+
+type Background {
+	employment: String
+	highEduAttainment: String
+	isSeniorCitizen: String
+	isPWD: Boolean
+	isSingleParent: Boolean
+	isStudent: Boolean
+	residencyLength: Int
+}
+
+type Address {
+	houseNumber: String!
+	street: String!
+	barangay: ID!
+	region: String!
+	city: String!
+	zipcode: String!
+}
+
+# Inputs
+
+input NameInput {
+	first: String!
+	middle: String
+	last: String!
+	extension: String
+}
+
+input ContactPersonInput {
+	name: String!
+	contactNumber: String
+	relationship: String!
+	address: String
+}
+
+input BackgroundInput {
+	employment: String
+	highEduAttainment: String
+	isSeniorCitizen: Boolean
+	isPWD: Boolean
+	isSingleParent: Boolean
+	isStudent: Boolean
+	residencyLength: Int
+}
+
+input AddressInput {
+	houseNumber: String!
+	street: String!
+	barangay: ID!
+	region: String!
+	city: String!
+	zipcode: String!
+}
+
+type Query {
+	residents: [Resident]
+	resident(id: ID!): Resident
+}
+
+type Mutation {
+	resident_create(
+		name: NameInput!
+		sex: String!
+		birthday: String!
+		civilStatus: String!
+		nationality: String!
+		contactNumber: String!
+		contactPerson: ContactPersonInput!
+		address: AddressInput!
+		background: BackgroundInput
+		image_url: String
+	): Message
+	resident_update(
+		name: NameInput
+		sex: String
+		birthday: String
+		civilStatus: String
+		nationality: String
+		contactNumber: String
+		email: String
+		contactPerson: ContactPersonInput
+		address: AddressInput
+		background: BackgroundInput
+		image_url: String
+	): Resident
+	resident_delete(id: ID!): Message
+}

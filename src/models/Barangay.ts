@@ -55,6 +55,7 @@ interface Barangay extends Document {
 	barangayOfficials: BarangayOfficials;
 	images: Image[];
 	barangayMap: Image;
+	adminIds: mongoose.Types.ObjectId[];
 }
 
 const barangayInfoSchema: Schema<BarangayInfo> = new mongoose.Schema({
@@ -187,11 +188,22 @@ const barangaySchema: Schema<Barangay> = new mongoose.Schema(
 		barangayOfficials: barangayOfficialsSchema,
 		images: [imageSchema],
 		barangayMap: imageSchema,
+		adminIds: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: 'User',
+				required: true,
+			},
+		],
 	},
 	{
 		timestamps: true,
 	}
 );
+
+// Make sure to set the `toObject` and `toJSON` schema options to `true`.
+barangaySchema.set('toObject', { virtuals: true });
+barangaySchema.set('toJSON', { virtuals: true });
 
 const Barangay: Model<Barangay> = mongoose.model<Barangay>(
 	'Barangay',

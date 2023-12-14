@@ -190,6 +190,10 @@ residentSchema.pre<ResidentModel>('save', async function (next) {
 	}
 });
 
+// Make sure to set the `toObject` and `toJSON` schema options to `true`.
+residentSchema.set('toObject', { virtuals: true });
+residentSchema.set('toJSON', { virtuals: true });
+
 const Resident: Model<ResidentModel> = model<ResidentModel>(
 	'Resident',
 	residentSchema

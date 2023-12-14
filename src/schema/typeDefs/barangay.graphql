@@ -54,6 +54,7 @@ type Barangay {
 	barangayOfficials: BarangayOfficials!
 	images: [Image]!
 	barangayMap: Image!
+	adminIds: [ID]!
 	createdAt: String!
 	updatedAt: String!
 }
@@ -70,6 +71,7 @@ type Mutation {
 		input: BarangayOfficialsInput!
 	): Message
 	barangay_images_update(barangayId: ID!, images: [ImageInput]!): Message
+	barangay_adminIds_update(barangayId: ID!, adminIds: [ID!]!): Message
 	barangay_delete(barangayId: ID!): Message!
 }
 
@@ -126,10 +128,15 @@ input ImageInput {
 	url: String
 }
 
+input AdminIds {
+	adminId: ID!
+}
+
 input BarangayInput {
 	name: String!
 	barangayInfo: BarangayInfoInput!
 	barangayOfficials: BarangayOfficialsInput
 	images: [ImageInput]
 	barangayMap: ImageInput
+	adminIds: [AdminIds]
 }

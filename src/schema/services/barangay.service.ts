@@ -32,8 +32,9 @@ export const getSingleBarangay = async (args: any) => {
 
 // @desc    Create Barangay
 // @access  Private || Admin
-export const createBarangay = async (args: any) => {
+export const createBarangay = async (args: any, context: any) => {
 	const { name, barangayInfo } = args.input;
+	const { user } = context;
 
 	const nameExist = await Barangay.findOne({ name });
 
@@ -44,6 +45,7 @@ export const createBarangay = async (args: any) => {
 	const newBarangay = await Barangay.create({
 		name,
 		barangayInfo,
+		adminIds: [user._id],
 	});
 
 	return newBarangay;
@@ -77,6 +79,26 @@ export const updateBarangayImages = async (args: any) => {
 	await barangay.save();
 
 	return { message: 'Barangay details updated' };
+};
+
+// @desc    Update Barangay Images
+// @access  Private || Admin
+export const updateBarangayAdmins = async (args: any, context: any) => {
+	const { barangayId, adminIds } = args;
+	const barangay = await Barangay.findById(barangayId);
+
+	if (!barangay) throw new NotFoundError('Barangay not found with this id');
+
+	// Check if the userId already exists in adminIds array
+	if (barangay.adminIds.includes(adminIds)) {
+		throw new InputError('User ID already exists in adminIds');
+	}
+
+	// Add the userId to the adminIds array and save the document
+	barangay.adminIds.push(adminIds);
+	await barangay.save();
+
+	return { message: 'Barangay admins updated' };
 };
 
 // @desc    Delete Barangay
